@@ -12,7 +12,7 @@ class Database(object):
 	
 	def table(self, tableName, *colNames):
 		if tableName in self.database:
-			table = Table(self, self.database[tableName]["name"], self.database[tableName]["columns"])
+			table = Table(self, tableName, self.database[tableName]["columns"])
 			table.data = self.database[tableName]
 			table.rowCount = table.data['rowCount']
 			return table
@@ -34,7 +34,7 @@ class Table(object):
 		self.name = tableName
 		self.cols = colNames
 		self.rowCount = 0
-		self.data = {"name": tableName, "rowCount": 0}
+		self.data = {"rowCount": 0}
 		self.data["columns"] = self.cols
 	
 	def addRow(self, *data):
@@ -90,3 +90,4 @@ def test3():
 	db = Database('data.json')
 	db.delTable('Names')
 	db.commitDatabase()
+	
