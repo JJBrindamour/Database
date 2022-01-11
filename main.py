@@ -20,6 +20,9 @@ class Database(object):
 			table = Table(self, tableName, colNames)
 			self.database[tableName] = table.data
 			return table
+
+	def delTable(self, tableName):
+		self.database.pop(tableName)
 	
 	def commitDatabase(self):
 		with open(self.file, 'w') as f:
@@ -83,4 +86,7 @@ def test2():
 	print(work.find('Person ID', '2'))
 	db.commitDatabase()
 
-test2()
+def test3():
+	db = Database('data.json')
+	db.delTable('Names')
+	db.commitDatabase()
