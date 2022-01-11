@@ -5,7 +5,7 @@ class Database(object):
 		self.file = fileName
 		if os.path.exists(self.file):
 			with open(self.file, 'r') as f:
-	      tablesData = f.read()
+				tablesData = f.read()
 				self.database = json.loads(tablesData)
 		else:
 			self.database = {}
@@ -49,11 +49,11 @@ class Table(object):
 	def find(self, column, value):
 		colIndex = self.cols.index(column)
 		rows = []
-		for key, value in self.data:
+		for key, data in self.data.items():
 			if key != "name" and key != 'rowCount' and key != 'columns':
-				rows.append(value[colIndex])
+				rows.append(data[colIndex])
 		rowIndex = rows.index(value)
-		rowDataList = self.data[f"row {rowIndex}"]
+		rowDataList = self.data[f"row {rowIndex + 1}"]
 		rowDataStr = ''
 		count = 0
 		for value in rowDataList:
@@ -62,10 +62,12 @@ class Table(object):
 		rowDataStr = rowDataStr[:-2]
 		return rowDataStr
 
-db = Database('data.json')
-db.addTable('Names', 'fname', 'lname')
-names = db.table('Names')
-names.addRow('JJ', 'Brindamour')
-names.commitTable()
-names.find('fname', 'JJ')
-db.commitDatabase()
+def test():
+	db = Database('data.json')
+	db.addTable('Names', 'fname', 'lname')
+	names = db.table('Names')
+	names.addRow('JJ', 'Brindamour')
+	names.commitTable()
+	print(names.find('fname', 'JJ'))
+	db.commitDatabase()
+
