@@ -1,0 +1,40 @@
+{
+  "Names": {
+    "name": "Names",
+    "rowCount": 2,
+    "columns": [
+      "Primary Key",
+      "fname",
+      "lname"
+    ],
+    "row 1": [
+      "1",
+      "JJ",
+      "Brindamour"
+    ],
+    "row 2": [
+      "2",
+      "Tim",
+      "Smith"
+    ]
+  },
+  "Work": {
+    "name": "Work",
+    "rowCount": 2,
+    "columns": [
+      "Person ID",
+      "Occupation",
+      "Salary"
+    ],
+    "row 1": [
+      "1",
+      "Fisherman",
+      35000
+    ],
+    "row 2": [
+      "2",
+      "Software Engineer",
+      100000
+    ]
+  }
+}

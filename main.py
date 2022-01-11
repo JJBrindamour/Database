@@ -62,12 +62,26 @@ class Table(object):
 		rowDataStr = rowDataStr[:-2]
 		return rowDataStr
 
-def test():
+def test1():
 	db = Database('data.json')
-	db.addTable('Names', 'fname', 'lname')
+	db.addTable('Names', 'Primary Key', 'fname', 'lname')
+	db.addTable('Work', 'Person ID', 'Occupation', 'Salary')
 	names = db.table('Names')
-	names.addRow('JJ', 'Brindamour')
+	work = db.table('Work')
+	names.addRow('1', 'JJ', 'Brindamour')
+	work.addRow('1', 'Fisherman', 35000)
 	names.commitTable()
 	print(names.find('fname', 'JJ'))
 	db.commitDatabase()
 
+def test2():
+	db = Database('data.json')
+	names = db.table('Names')
+	work = db.table('Work')
+	names.addRow('2', 'Tim', 'Smith')
+	work.addRow('2', 'Software Engineer', 100000)
+	names.commitTable()
+	print(work.find('Person ID', '2'))
+	db.commitDatabase()
+
+test2()
