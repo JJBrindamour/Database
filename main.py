@@ -10,15 +10,16 @@ class Database(object):
 		else:
 			self.database = {}
 	
-	def addTable(self, tableName, *colNames):
-		table = Table(self, tableName, colNames)
-		self.database[tableName] = table.data
-
-	def table(self, tableName):	
-		table = Table(self, self.database[tableName]["name"], self.database[tableName]["columns"])
-		table.data = self.database[tableName]
-		table.rowCount = table.data['rowCount']
-		return table
+	def table(self, tableName, *colNames):
+		if tableName in self.database:
+			table = Table(self, self.database[tableName]["name"], self.database[tableName]["columns"])
+			table.data = self.database[tableName]
+			table.rowCount = table.data['rowCount']
+			return table
+		else:	
+			table = Table(self, tableName, colNames)
+			self.database[tableName] = table.data
+			return table
 	
 	def commitDatabase(self):
 		with open(self.file, 'w') as f:
@@ -64,10 +65,8 @@ class Table(object):
 
 def test1():
 	db = Database('data.json')
-	db.addTable('Names', 'Primary Key', 'fname', 'lname')
-	db.addTable('Work', 'Person ID', 'Occupation', 'Salary')
-	names = db.table('Names')
-	work = db.table('Work')
+	names = db.table('Names', 'Primary Key', 'fname', 'lname')
+	work = db.table('Work', 'Person ID', 'Occupation', 'Salary')
 	names.addRow('1', 'JJ', 'Brindamour')
 	work.addRow('1', 'Fisherman', 35000)
 	names.commitTable()
