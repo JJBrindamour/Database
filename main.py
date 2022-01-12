@@ -1,5 +1,4 @@
 import json, os
-print
 
 class Database(object):
 	def __init__(self, fileName):
@@ -88,15 +87,22 @@ class Table(object):
 	
 	def addRow(self, *data):
 		data = list(data)
-		for col, _data in self.cols.items():
-			if _data["primaryKey"] == True:
+		for col, info in self.cols.items():
+			if info["primaryKey"] == True:
 				data.insert(self.colNames.index(col), self.rowCount)
+			if info["unique"] == True:
+				colIndex = self.colNames.index(col)
+				for row, info in self.data.items():
+					if row != "rowCount" and row != "columns":
+						if info[colIndex] == data[colIndex]:
+							raise Exception(f"Constraint Error: \"{data[colIndex]}\" is already in the Database under column \"{self.colNames[colIndex]}\"")
+
 		if len(data) == len(self.cols):
 			self.data[f"row {self.rowCount + 1}"] = data
 			self.data["rowCount"] += 1
+			self.rowCount += 1
 		else:
-			pass
-			#raise Exception("Data Error: Incorrect Amount of Data Passed")
+			raise Exception("Data Error: Incorrect Amount of Data Passed")
 	
 	def removeRow(self, rowNum):
 		pass
@@ -108,7 +114,7 @@ class Table(object):
 		colIndex = self.colNames.index(column)
 		rows = []
 		for key, data in self.data.items():
-			if key != "name" and key != 'rowCount' and key != 'columns':
+			if key != 'rowCount' and key != 'columns':
 				rows.append(data[colIndex])
 		rowIndex = rows.index(value)
 		rowDataList = self.data[f"row {rowIndex + 1}"]
@@ -144,9 +150,14 @@ def test2():
 
 def test3():
 	db = Database('data.json')
+	table = db.table("Table", "Primary Key", "Unique", primaryKey=(True, False), unique=(True, True))
+	table.addRow("data")
+	table.commitTable()
+	db.commitDatabase()
+	table.addRow("data")
+
+def test4():
+	db = Database('data.json')
 	db.delTable('Names')
 	db.commitDatabase()
-
-test1()
-test2()
-test3()
+	
