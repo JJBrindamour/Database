@@ -96,6 +96,7 @@ class Table(object):
 					if row != "rowCount" and row != "columns":
 						if info[colIndex] == data[colIndex]:
 							raise Exception(f"Constraint Error: \"{data[colIndex]}\" is already in the Database under column \"{self.colNames[colIndex]}\"")
+			if info["notNull"] == True and data[self.colNames.index(col)] == None: raise Exception(f"Data Error: {col} cannot be Null")
 
 		if len(data) == len(self.cols):
 			self.data[f"row {self.rowCount + 1}"] = data
@@ -158,6 +159,13 @@ def test3():
 
 def test4():
 	db = Database('data.json')
+	table = db.table('Table', 'primaryKey', 'fname', 'lname', primaryKey=(True, False, False), notNull=(False, True, False))
+	table.addRow('JJ', 'Brindamour')
+	table.addRow(None, None)
+	table.commitTable()
+	db.commitDatabase()
+
+def test5():
+	db = Database('data.json')
 	db.delTable('Names')
 	db.commitDatabase()
-	
