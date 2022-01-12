@@ -7,7 +7,11 @@ __pycache__/
 *.so
 
 # Replit
-*.replit
+.replit
+
+# Project Specific
+*.txt
+*.json
 
 # Distribution / packaging
 .Python
