@@ -42,9 +42,9 @@ class Database(object):
 			except KeyError:
 				foreignKey = constraints["foreignKey"] = nullConstraint
 			try:
-				defualt = constraints["defualt"]
+				default = constraints["default"]
 			except KeyError:
-				defualt = constraints["defualt"] = nullConstraint
+				default = constraints["default"] = nullConstraint
 
 			colData = {}
 			count = 0
@@ -54,7 +54,7 @@ class Database(object):
 					"unique": unique[count],
 					"primaryKey": primaryKey[count],
 					"foreignKey": foreignKey[count],
-					"defualt": defualt[count]
+					"default": default[count]
 				}
 				count += 1
 			
@@ -106,6 +106,9 @@ class Table(object):
 				if not keyContained:
 					raise Exception(f"Data Error: Foreign Key \"{data[colIndex]}\" is not in table \"{info['foreignKey'][0]}\", column \"{info['foreignKey'][1]}\"")
 
+			if info["default"] != None:
+				if len(data) != len(self.colNames):
+					data.insert(self.colNames.index(col), info["default"])
 
 		if len(data) == len(self.cols):
 			self.data[f"row {self.rowCount + 1}"] = data

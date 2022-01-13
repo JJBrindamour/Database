@@ -9,7 +9,7 @@ def test1():
 	work.addRow(0, 'Fisherman', 35000)
 	names.commit()
 	work.commit()
-	#print(names.find('fname', 'JJ'))
+	print(names.find('fname', 'JJ'))
 	db.commit()
 
 def test2():
@@ -20,7 +20,7 @@ def test2():
 	names.commit()
 	work.addRow(1, 'Software Engineer', 100000)
 	work.commit()
-	#print(work.find('Person ID', '2'))
+	print(work.find('Person ID', '2'))
 	db.commit()
 
 def test3():
@@ -56,5 +56,13 @@ def test6():
 	db.delTable('Names')
 	db.commit()
 
-test1()
-test2()
+def test7():
+	db = Database('data.json')
+	table = db.table('Table', 'Primary Key', 'SomeData', primaryKey=(True, False), defualt=(None, "This is Data"))
+	table.commit()
+	db.commit()
+	table.addRow()
+	table.commit()
+	db.commit()
+
+test7()
