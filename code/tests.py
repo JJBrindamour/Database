@@ -3,7 +3,8 @@ from database import Database
 def test1():
 	db = Database('data.json')
 	names = db.table('Names', 'Primary Key', 'fname', 'lname', primaryKey=(True, False, False))
-	work = db.table('Work', 'Primary Key', 'Person ID', 'Occupation', 'Salary', primaryKey=(True, False, False, False))
+	names.commit()
+	work = db.table('Work', 'Primary Key', 'Person ID', 'Occupation', 'Salary', primaryKey=(True, False, False, False), foreignKey=(None, ["Names", "Primary Key"], None, None))
 	names.addRow('JJ', 'Brindamour')
 	work.addRow(0, 'Fisherman', 35000)
 	names.commit()
@@ -16,8 +17,8 @@ def test2():
 	names = db.table('Names')
 	work = db.table('Work')
 	names.addRow('Tim', 'Smith')
-	work.addRow(2, 'Software Engineer', 100000)
 	names.commit()
+	work.addRow(1, 'Software Engineer', 100000)
 	work.commit()
 	#print(work.find('Person ID', '2'))
 	db.commit()
@@ -57,4 +58,3 @@ def test6():
 
 test1()
 test2()
-test5()
