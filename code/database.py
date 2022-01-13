@@ -83,17 +83,12 @@ class Table(object):
 	def addRow(self, *data):
 		data = list(data)
 		for col, info in self.cols.items():
-			if info["primaryKey"] == True:
-				data.insert(self.colNames.index(col), self.rowCount)
-			
-			if info["unique"] == True:
-				colIndex = self.colNames.index(col)
-				for row, info in self.data.items():
-					if row != "rowCount" and row != "columns":
-						if info[colIndex] == data[colIndex]:
-							raise Exception(f"Constraint Error: \"{data[colIndex]}\" is already in the Database under column \"{self.colNames[colIndex]}\"")
-			
-			if info["notNull"] == True and data[self.colNames.index(col)] == None: raise Exception(f"Data Error: {col} cannot be Null")
+			if info["default"] != None:
+				if len(data) != len(self.colNames):
+					data.insert(self.colNames.index(col), info["default"])
+					
+			if info["notNull"] == True and data[self.colNames.index(col)] == None: 
+				raise Exception(f"Data Error: {col} cannot be Null")
 			
 			if info["foreignKey"] != None:
 				colIndex = self.colNames.index(col)
@@ -106,9 +101,15 @@ class Table(object):
 				if not keyContained:
 					raise Exception(f"Data Error: Foreign Key \"{data[colIndex]}\" is not in table \"{info['foreignKey'][0]}\", column \"{info['foreignKey'][1]}\"")
 
-			if info["default"] != None:
-				if len(data) != len(self.colNames):
-					data.insert(self.colNames.index(col), info["default"])
+			if info["primaryKey"] == True:
+				data.insert(self.colNames.index(col), self.rowCount)
+
+			if info["unique"] == True:
+				colIndex = self.colNames.index(col)
+				for row, info in self.data.items():
+					if row != "rowCount" and row != "columns":
+						if info[colIndex] == data[colIndex]:
+							raise Exception(f"Constraint Error: \"{data[colIndex]}\" is already in the Database under column \"{self.colNames[colIndex]}\"")
 
 		if len(data) == len(self.cols):
 			self.data[f"row {self.rowCount + 1}"] = data
@@ -140,8 +141,8 @@ class Table(object):
 	def find(self, column, value):
 		colIndex = self.colNames.index(column)
 		rows = []
-		for key, data in self.data.items():
-			if key != 'rowCount' and key != 'columns':
+		for row, data in self.data.items():
+			if row != 'rowCount' and row != 'columns':
 				rows.append(data[colIndex])
 		rowIndex = rows.index(value)
 		rowDataList = self.data[f"row {rowIndex + 1}"]
