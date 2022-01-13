@@ -38,13 +38,9 @@ class Database(object):
 			except KeyError:
 				primaryKey = constraints["primaryKey"] = falseConstraint
 			try:
-				foreginKeyTable = constraints["foreginKeyTable"]
+				foreignKey = constraints["foreignKey"]
 			except KeyError:
-				foreginKeyTable = constraints["foreginKeyTable"] = nullConstraint
-			try:
-				foreginKeyCol = constraints["foreginKeyCol"]
-			except KeyError:
-				foreginKeyCol = constraints["foreginKeyCol"] = nullConstraint
+				foreignKey = constraints["foreignKey"] = nullConstraint
 			try:
 				defualt = constraints["defualt"]
 			except KeyError:
@@ -57,8 +53,7 @@ class Database(object):
 					"notNull": notNull[count],
 					"unique": unique[count],
 					"primaryKey": primaryKey[count],
-					"foreginKeyTable": foreginKeyTable[count],
-					"foreginKeyCol": foreginKeyCol[count],
+					"foreignKey": foreignKey[count],
 					"defualt": defualt[count]
 				}
 				count += 1
@@ -69,7 +64,7 @@ class Database(object):
 	def delTable(self, tableName):
 		self.database.pop(tableName)
 	
-	def commitDatabase(self):
+	def commit(self):
 		with open(self.file, 'w') as f:
 			f.write(json.dumps(self.database, indent=2))
 
@@ -97,6 +92,8 @@ class Table(object):
 						if info[colIndex] == data[colIndex]:
 							raise Exception(f"Constraint Error: \"{data[colIndex]}\" is already in the Database under column \"{self.colNames[colIndex]}\"")
 			if info["notNull"] == True and data[self.colNames.index(col)] == None: raise Exception(f"Data Error: {col} cannot be Null")
+			if info["foreignKey"] != None:
+				pass
 
 		if len(data) == len(self.cols):
 			self.data[f"row {self.rowCount + 1}"] = data
@@ -106,9 +103,23 @@ class Table(object):
 			raise Exception("Data Error: Incorrect Amount of Data Passed")
 	
 	def removeRow(self, rowNum):
-		pass
+		self.data.pop(f"row {rowNum}")
+		data = []
+		for row, _data in self.data.items():
+			data.append(_data)
+		
+		i = -2
+		while i <= len(self.data) - 1:
+			if i > rowNum:
+				self.data.pop(f"row {i}")
+				self.data[f"row {i - 1}"] = data[i]
+				for col in self.colNames:
+					if self.data["columns"][col]["primaryKey"] == True:
+						data[i][self.colNames.index(col)] -= 1
+			i += 1
+
 	
-	def commitTable(self):
+	def commit(self):
 		self.database.database[self.name] = self.data
 
 	def find(self, column, value):
@@ -132,29 +143,29 @@ def test1():
 	names = db.table('Names', 'Primary Key', 'fname', 'lname', primaryKey=(True, False, False))
 	work = db.table('Work', 'Primary Key', 'Person ID', 'Occupation', 'Salary', primaryKey=(True, False, False, False))
 	names.addRow('JJ', 'Brindamour')
-	work.addRow('1', 'Fisherman', 35000)
-	names.commitTable()
-	work.commitTable()
-	print(names.find('fname', 'JJ'))
-	db.commitDatabase()
+	work.addRow(0, 'Fisherman', 35000)
+	names.commit()
+	work.commit()
+	#print(names.find('fname', 'JJ'))
+	db.commit()
 
 def test2():
 	db = Database('data.json')
 	names = db.table('Names')
 	work = db.table('Work')
 	names.addRow('Tim', 'Smith')
-	work.addRow('2', 'Software Engineer', 100000)
-	names.commitTable()
-	work.commitTable()
-	print(work.find('Person ID', '2'))
-	db.commitDatabase()
+	work.addRow(2, 'Software Engineer', 100000)
+	names.commit()
+	work.commit()
+	#print(work.find('Person ID', '2'))
+	db.commit()
 
 def test3():
 	db = Database('data.json')
 	table = db.table("Table", "Primary Key", "Unique", primaryKey=(True, False), unique=(True, True))
 	table.addRow("data")
-	table.commitTable()
-	db.commitDatabase()
+	table.commit()
+	db.commit()
 	table.addRow("data")
 
 def test4():
@@ -162,10 +173,22 @@ def test4():
 	table = db.table('Table', 'primaryKey', 'fname', 'lname', primaryKey=(True, False, False), notNull=(False, True, False))
 	table.addRow('JJ', 'Brindamour')
 	table.addRow(None, None)
-	table.commitTable()
-	db.commitDatabase()
+	table.commit()
+	db.commit()
 
 def test5():
 	db = Database('data.json')
+	names = db.table('Names')
+	work = db.table('Work')
+	names.addRow('Jake', 'Ceaser')
+	work.addRow(2, 'Musician', 56000)
+	names.commit()
+	work.commit()
+	work.removeRow(2)
+	work.commit()
+	db.commit()
+
+def test6():
+	db = Database('data.json')
 	db.delTable('Names')
-	db.commitDatabase()
+	db.commit()
